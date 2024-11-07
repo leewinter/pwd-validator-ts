@@ -2,10 +2,17 @@ import { RuleOptions } from "./options";
 
 function isPasswordValid(
   password: string,
-  rules: Array<(password: string, options?: RuleOptions) => boolean>,
-  options?: RuleOptions
+  rules: Array<
+    (password: string, options?: RuleOptions, outcome?: string[]) => boolean
+  >,
+  options?: RuleOptions,
+  outcomes?: string[]
 ): boolean {
-  return rules.every((rule) => rule(password, options));
+  let allPassed = true;
+  rules.forEach((rule) => {
+    if (!rule(password, options, outcomes)) allPassed = false;
+  });
+  return allPassed;
 }
 
 // Define individual rule functions with options
