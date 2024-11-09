@@ -12,67 +12,82 @@ const ruleFunctions = [
   rules.hasUnderscore,
 ];
 
-const optionsIncludeWordStrong: RuleOptions = { includeWord: "Strong" };
-const optionsIncludeWordBanana: RuleOptions = { includeWord: "Banana" };
-
 // Custom rule to extend standard ruleset
-function mustInclude(
+function customRuleMustIncludeStrong(
   password: string,
   options: RuleOptions = {},
-  outcome: string[] = []
+  outcomes: string[] = []
 ): boolean {
-  const regex = new RegExp(`${options.includeWord}`, "i"); // 'i' makes it case-insensitive
+  const wordToInclude = "Strong";
+  const regex = new RegExp(`${wordToInclude}`, "i"); // 'i' makes it case-insensitive
 
   const doesInclude = regex.test(password);
 
-  if (!doesInclude)
-    outcome.push(`Password must include ${options.includeWord}`);
+  if (!doesInclude) outcomes.push(`Password must include ${wordToInclude}`);
+  return doesInclude;
+}
+
+// Custom rule to extend standard ruleset
+function customRuleMustIncludeBanana(
+  password: string,
+  options: RuleOptions = {},
+  outcomes: string[] = []
+): boolean {
+  const wordToInclude = "Banana";
+  const regex = new RegExp(`${wordToInclude}`, "i"); // 'i' makes it case-insensitive
+
+  const doesInclude = regex.test(password);
+
+  if (!doesInclude) outcomes.push(`Password must include ${wordToInclude}`);
   return doesInclude;
 }
 
 function mustIncludeStatic(
   password: string,
   options: RuleOptions = {},
-  outcome: string[] = []
+  outcomes: string[] = []
 ): boolean {
   const minLength = 18;
   const valid = password.length >= minLength;
-  console.log("valid", valid);
-  if (!valid) outcome.push(`Password must be at least 18 chars`);
+
+  if (!valid)
+    outcomes.push(`Password must be at least ${minLength} characters long.`);
   return valid;
 }
 
 describe("Extended Password Validation", () => {
   it("should validate a strong password meeting extended criteria", () => {
+    const outcomes: string[] = [];
     expect(
       isPasswordValid(
         strongPassword,
-        [...ruleFunctions, mustInclude],
-        optionsIncludeWordStrong
+        [...ruleFunctions, customRuleMustIncludeStrong],
+        {},
+        outcomes
       )
     ).toBe(true);
+    expect(outcomes).toEqual([]);
   });
 
-  it("should validate a strong password not meeting extended criteria", () => {
+  it("should invalidate a strong password not meeting extended criteria", () => {
+    const outcomes: string[] = [];
     expect(
       isPasswordValid(
         strongPassword,
-        [...ruleFunctions, mustInclude],
-        optionsIncludeWordBanana
+        [...ruleFunctions, customRuleMustIncludeBanana],
+        {},
+        outcomes
       )
     ).toBe(false);
+    expect(outcomes).toContain("Password must include Banana");
   });
 
   it("should not meet extended criteria and outputs reasons", () => {
-    let outcomeResults: string[] = [];
+    const outcomes: string[] = [];
     expect(
-      isPasswordValid(
-        strongPassword,
-        [mustInclude, mustIncludeStatic],
-        optionsIncludeWordBanana,
-        outcomeResults
-      )
+      isPasswordValid(strongPassword, [mustIncludeStatic], {}, outcomes)
     ).toBe(false);
-    expect(outcomeResults).toHaveLength(2);
+    expect(outcomes).toHaveLength(1);
+    expect(outcomes).toContain("Password must be at least 18 characters long.");
   });
 });
