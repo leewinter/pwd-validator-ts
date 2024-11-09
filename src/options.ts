@@ -1,4 +1,6 @@
 export type RuleOptions = {
+  /** The minimum length allowed for the rule. */
   minLength?: number;
-  includeWord?: string;
+  /** Whether to stop execution if the rule fails. */
+  returnOnFail?: Boolean;
 };
