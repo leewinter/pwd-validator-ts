@@ -1,5 +1,7 @@
 # pwd-validator-ts
 
+[![Run Jest Tests](https://github.com/leewinter/pwd-validator-ts/actions/workflows/jest-tests.yml/badge.svg)](https://github.com/leewinter/pwd-validator-ts/actions/workflows/jest-tests.yml)
+
 A simple, extensible password validator written in TypeScript. It allows for customizable validation rules to meet different password policies.
 
 ## Getting started
